@@ -1,0 +1,46 @@
+{
+    "total_trials": 2160,
+    "clean_trials": 1031,
+    "rejected_trials": 1129,
+    "rejection_rate_percent": 52.26851851851851,
+    "class_balance_clean": {
+        "Left (0)": 533,
+        "Right (1)": 498
+    },
+    "clean_trial_shape": [
+        1031,
+        4,
+        751
+    ],
+    "channels": [
+        "FZ",
+        "C3",
+        "CZ",
+        "C4"
+    ],
+    "sampling_rate_hz": 250.0,
+    "epoch_duration_seconds": 3.0,
+    "epoch_samples_count": 751,
+    "top_rejection_reasons_sample": {
+        "CLEAN": 1031,
+        "extreme_ptp_amplitude_FZ_(1866.7uV>200.0uV); extreme_ptp_amplitude_C3_(12687.1uV>200.0uV); extreme_ptp_amplitude_CZ_(308.4uV>200.0uV); extreme_ptp_amplitude_C4_(10512.0uV>200.0uV); statistical_variance_outlier_(z=2715.59)": 2,
+        "extreme_ptp_amplitude_FZ_(322.7uV>200.0uV); extreme_ptp_amplitude_C3_(1992.0uV>200.0uV); extreme_ptp_amplitude_C4_(1750.8uV>200.0uV); statistical_variance_outlier_(z=63.48)": 2,
+        "flatline_dead_channel_FZ_(var=4.1271e-01); flatline_dead_channel_CZ_(var=6.6276e-02)": 2,
+        "flatline_dead_channel_FZ_(var=4.6286e-01); flatline_dead_channel_CZ_(var=5.7883e-02)": 2,
+        "flatline_dead_channel_CZ_(var=1.0295e-01)": 2,
+        "extreme_ptp_amplitude_FZ_(285.4uV>200.0uV); extreme_ptp_amplitude_C3_(1557.6uV>200.0uV); extreme_ptp_amplitude_C4_(1349.0uV>200.0uV); statistical_variance_outlier_(z=37.42)": 2,
+        "flatline_dead_channel_FZ_(var=4.4718e-01); flatline_dead_channel_CZ_(var=7.1919e-02)": 2,
+        "extreme_ptp_amplitude_FZ_(331.0uV>200.0uV); extreme_ptp_amplitude_C3_(2130.7uV>200.0uV); extreme_ptp_amplitude_C4_(1629.5uV>200.0uV); statistical_variance_outlier_(z=71.84)": 2,
+        "flatline_dead_channel_CZ_(var=3.4363e-01)": 2,
+        "extreme_ptp_amplitude_FZ_(765.4uV>200.0uV); extreme_ptp_amplitude_C3_(5541.1uV>200.0uV); extreme_ptp_amplitude_C4_(6200.9uV>200.0uV); statistical_variance_outlier_(z=704.07)": 2,
+        "flatline_dead_channel_CZ_(var=3.7592e-01)": 2,
+        "flatline_dead_channel_CZ_(var=2.5585e-01)": 2,
+        "flatline_dead_channel_FZ_(var=2.5388e-01); flatline_dead_channel_CZ_(var=2.0718e-01)": 2,
+        "flatline_dead_channel_FZ_(var=2.9152e-01); flatline_dead_channel_CZ_(var=3.2690e-01)": 2,
+        "flatline_dead_channel_FZ_(var=2.5862e-01); flatline_dead_channel_CZ_(var=2.8158e-01)": 2,
+        "extreme_ptp_amplitude_FZ_(211.3uV>200.0uV); extreme_ptp_amplitude_C4_(390.9uV>200.0uV); statistical_variance_outlier_(z=5.23)": 2,
+        "extreme_ptp_amplitude_FZ_(5390.5uV>200.0uV); extreme_ptp_amplitude_C3_(292.9uV>200.0uV); extreme_ptp_amplitude_CZ_(3483.5uV>200.0uV); extreme_ptp_amplitude_C4_(2219.5uV>200.0uV); statistical_variance_outlier_(z=465.06)": 2,
+        "extreme_ptp_amplitude_FZ_(422.5uV>200.0uV); extreme_ptp_amplitude_C3_(496.7uV>200.0uV); extreme_ptp_amplitude_CZ_(288.1uV>200.0uV); extreme_ptp_amplitude_C4_(1205.0uV>200.0uV); statistical_variance_outlier_(z=20.99)": 2,
+        "extreme_ptp_amplitude_C3_(265.9uV>200.0uV); extreme_ptp_amplitude_CZ_(228.5uV>200.0uV); extreme_ptp_amplitude_C4_(598.6uV>200.0uV); statistical_variance_outlier_(z=5.89)": 2
+    }
+}

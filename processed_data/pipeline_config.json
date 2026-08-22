@@ -1,0 +1,27 @@
+{
+    "sampling_rate": 250.0,
+    "num_samples_per_trial": 2500,
+    "adc_scale_to_uv": 0.022351744455307063,
+    "channels": [
+        "FZ",
+        "C3",
+        "CZ",
+        "C4"
+    ],
+    "bandpass_lowcut": 0.5,
+    "bandpass_highcut": 40.0,
+    "filter_order": 4,
+    "mu_beta_lowcut": 8.0,
+    "mu_beta_highcut": 30.0,
+    "notch_freq": 50.0,
+    "notch_quality_factor": 30.0,
+    "reref_method": "CAR",
+    "epoch_start_time": 0.5,
+    "epoch_end_time": 3.5,
+    "baseline_start_time": 0.0,
+    "baseline_end_time": 0.5,
+    "max_peak_to_peak_amp": 200.0,
+    "apply_winsorization": true,
+    "winsorize_sigma": 4.5,
+    "normalization_method": "zscore"
+}

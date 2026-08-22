@@ -1,0 +1,16 @@
+# Raw downloaded data folders (large datasets)
+raw_data/
+drive_data/
+
+# Python cache & logs
+__pycache__/
+*.py[cod]
+*$py.class
+*.log
+
+# Jupyter notebook checkpoints
+.ipynb_checkpoints/
+
+# System files
+.DS_Store
+Thumbs.db
