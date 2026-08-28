@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>BCI Motor Imagery Classification</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error-container": "#ffdad6",
+                        "primary-fixed-dim": "#bec6e0",
+                        "tertiary-fixed-dim": "#adc6ff",
+                        "primary": "#000000",
+                        "on-secondary-fixed-variant": "#005049",
+                        "surface-container": "#e5eeff",
+                        "outline": "#76777d",
+                        "surface-tint": "#565e74",
+                        "on-primary": "#ffffff",
+                        "on-surface": "#0b1c30",
+                        "on-secondary-container": "#006f66",
+                        "on-tertiary-fixed-variant": "#004395",
+                        "inverse-on-surface": "#eaf1ff",
+                        "on-primary-fixed-variant": "#3f465c",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-container": "#3980f4",
+                        "error": "#ba1a1a",
+                        "on-tertiary": "#ffffff",
+                        "secondary-fixed": "#89f5e7",
+                        "surface-container-highest": "#d3e4fe",
+                        "on-primary-fixed": "#131b2e",
+                        "secondary-container": "#86f2e4",
+                        "on-error": "#ffffff",
+                        "inverse-surface": "#213145",
+                        "surface-dim": "#cbdbf5",
+                        "on-primary-container": "#7c839b",
+                        "on-error-container": "#93000a",
+                        "secondary": "#006a61",
+                        "background": "#f8f9ff",
+                        "on-secondary": "#ffffff",
+                        "tertiary-container": "#001a42",
+                        "on-secondary-fixed": "#00201d",
+                        "primary-container": "#131b2e",
+                        "surface": "#f8f9ff",
+                        "tertiary": "#000000",
+                        "primary-fixed": "#dae2fd",
+                        "on-tertiary-fixed": "#001a42",
+                        "on-background": "#0b1c30",
+                        "surface-container-low": "#eff4ff",
+                        "outline-variant": "#c6c6cd",
+                        "surface-variant": "#d3e4fe",
+                        "inverse-primary": "#bec6e0",
+                        "secondary-fixed-dim": "#6bd8cb",
+                        "surface-bright": "#f8f9ff",
+                        "tertiary-fixed": "#d8e2ff",
+                        "surface-container-high": "#dce9ff",
+                        "on-surface-variant": "#45464d"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "base": "4px",
+                        "gutter": "24px",
+                        "md": "24px",
+                        "xs": "8px",
+                        "lg": "40px",
+                        "xl": "64px",
+                        "margin": "32px",
+                        "sm": "16px"
+                    },
+                    "fontFamily": {
+                        "label-md": ["JetBrains Mono"],
+                        "display-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "label-sm": ["JetBrains Mono"],
+                        "body-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                        "display-lg": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "label-sm": ["10px", { "lineHeight": "14px", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "headline-lg": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined[data-weight="fill"] {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background antialiased min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<nav class="bg-surface docked full-width top-0 border-b border-outline-variant flat no shadows">
+<div class="flex justify-start items-center w-full px-margin py-4 max-w-full mx-auto">
+<div class="font-label-md text-label-md font-bold tracking-widest text-primary uppercase">
+                NEURALCORE BCI
+            </div>
+</div>
+</nav>
+<!-- Main Content Grid -->
+<main class="flex-grow container mx-auto px-margin py-xl max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- Left Column: Input & Actions -->
+<div class="lg:col-span-7 flex flex-col space-y-lg">
+<!-- Header Section -->
+<header>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-primary mb-xs">BCI Motor Imagery Classification</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">EEG-based LEFT/RIGHT hand movement prediction</p>
+</header>
+<!-- Upload Zone -->
+<div class="border border-outline-variant bg-surface-container-lowest rounded-DEFAULT p-lg flex flex-col items-center justify-center text-center transition-colors hover:border-tertiary cursor-pointer" id="upload-dropzone">
+<input accept=".csv" class="hidden" id="csv-file-input" type="file"/>
+<span class="material-symbols-outlined text-4xl text-outline mb-sm" data-icon="upload_file">upload_file</span>
+<p class="font-body-md text-body-md text-on-surface mb-md">Drag and drop CSV trial file or click to browse</p>
+<button class="bg-tertiary text-on-tertiary font-label-md text-label-md px-lg py-sm rounded-DEFAULT uppercase tracking-widest hover:opacity-90 transition-opacity flex items-center gap-xs" id="predict-button">
+                    Predict
+                    <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+<!-- Divider -->
+<div class="flex items-center w-full">
+<div class="flex-grow border-t border-outline-variant"></div>
+<span class="px-sm font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">OR</span>
+<div class="flex-grow border-t border-outline-variant"></div>
+</div>
+<!-- Secondary Action -->
+<div class="flex justify-center">
+<button class="border border-tertiary bg-transparent text-tertiary font-label-md text-label-md px-lg py-sm rounded-DEFAULT uppercase tracking-widest hover:bg-surface-container-low transition-colors" id="example-button">
+                    Try Example Trial
+                </button>
+</div>
+</div>
+<!-- Right Column: Results & Status -->
+<div class="lg:col-span-5 flex flex-col space-y-md">
+<!-- Idle State (Shown by Default, until an action happens) -->
+<div class="border border-outline-variant border-dashed bg-surface-container-lowest rounded-DEFAULT p-md flex flex-col items-center justify-center h-full text-center" id="result-idle">
+<span class="material-symbols-outlined text-4xl text-outline mb-sm" data-icon="analytics">analytics</span>
+<p class="font-body-md text-body-md text-on-surface-variant">Upload a trial or try the example to see a classification result.</p>
+</div>
+<!-- Loading State (Hidden by Default) -->
+<div class="hidden border border-outline-variant bg-surface-container-lowest rounded-DEFAULT p-md flex flex-col items-center justify-center h-full shadow-[0_4px_20px_rgba(15,23,42,0.08)]" id="loading-state">
+<span class="material-symbols-outlined text-4xl text-secondary animate-spin mb-sm" data-icon="progress_activity">progress_activity</span>
+<p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest">Processing Data...</p>
+</div>
+<!-- Result Card (Success State) -->
+<div class="hidden border border-outline-variant bg-surface-container-lowest rounded-DEFAULT p-md flex flex-col h-full relative overflow-hidden shadow-[0_4px_20px_rgba(15,23,42,0.08)]" id="result-success">
+<div class="flex justify-between items-start mb-lg">
+<span class="font-label-md text-label-md uppercase tracking-widest text-on-surface-variant">Classification Result</span>
+<div class="bg-secondary-container text-on-secondary-container px-xs py-[2px] rounded-DEFAULT font-label-sm text-label-sm flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-secondary block"></span> Complete
+                    </div>
+</div>
+<div class="flex flex-col items-center justify-center flex-grow py-md">
+<span class="material-symbols-outlined text-6xl text-secondary mb-sm" data-icon="east" data-weight="fill" id="prediction-icon">east</span>
+<h2 class="font-display-lg text-display-lg text-primary uppercase tracking-tight" id="prediction-text">RIGHT</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-xs">Motor Imagery Detected</p>
+</div>
+<div class="mt-auto pt-md border-t border-outline-variant">
+<div class="flex justify-between mb-xs">
+<span class="font-label-md text-label-md text-on-surface">Confidence Level</span>
+<span class="font-label-md text-label-md text-secondary" id="confidence-value">94%</span>
+</div>
+<div class="w-full bg-surface-container h-1.5 rounded-full overflow-hidden">
+<div class="bg-secondary h-full rounded-full" id="confidence-progress" style="width: 94%;"></div>
+</div>
+</div>
+</div>
+<!-- Rejected State Card (Hidden by Default) -->
+<div class="hidden border border-error-container bg-surface-container-lowest rounded-DEFAULT p-sm flex items-start gap-sm" id="result-rejected">
+<span class="material-symbols-outlined text-error mt-0.5" data-icon="warning">warning</span>
+<div>
+<h3 class="font-headline-md text-headline-md text-error mb-1">Trial Rejected</h3>
+<p class="font-body-md text-body-md text-on-surface-variant" id="rejection-reason">Signal artifacts detected: Excessive ocular movement (EOG) interference in channels Fp1, Fp2.</p>
+</div>
+</div>
+</div>
+</main>
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body></html>
