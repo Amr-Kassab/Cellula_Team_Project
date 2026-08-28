@@ -1,0 +1,24 @@
+{
+  "accuracy_mean": 0.5092115754420524,
+  "balanced_accuracy_mean": 0.498781422049805,
+  "precision_mean": 0.5707775524002704,
+  "recall_mean": 0.17888888888888888,
+  "f1_mean": 0.20327592115207666,
+  "roc_auc_mean": 0.48874366571730354,
+  "accuracy_std": 0.012877465818563012,
+  "balanced_accuracy_std": 0.010451796471973097,
+  "precision_std": 0.21753424379117728,
+  "recall_std": 0.1906698517011004,
+  "f1_std": 0.19588831389416128,
+  "roc_auc_std": 0.04752188220990137,
+  "oof_metrics": {
+    "accuracy": 0.5092143549951503,
+    "balanced_accuracy": 0.49836305823669913,
+    "precision": 0.478494623655914,
+    "recall": 0.178714859437751,
+    "f1": 0.260233918128655,
+    "roc_auc": 0.47899666207042046
+  },
+  "number_of_parameters": 37202,
+  "training_time_seconds": 23.91528980000021
+}

@@ -1,0 +1,6 @@
+fold,train_count,validation_count,test_count,train_left,train_right,test_left,test_right,train_test_overlap
+1,824,inner 3-fold,207,426,398,107,100,0
+2,825,inner 3-fold,206,426,399,107,99,0
+3,825,inner 3-fold,206,426,399,107,99,0
+4,825,inner 3-fold,206,427,398,106,100,0
+5,825,inner 3-fold,206,427,398,106,100,0

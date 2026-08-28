@@ -1,0 +1,20 @@
+{
+  "outer_cv_mean": {
+    "accuracy": 0.5024389099948408,
+    "balanced_accuracy": 0.4978557448938334,
+    "precision": 0.47322668979418125,
+    "recall": 0.36349494949494954,
+    "f1": 0.4005330909837145,
+    "roc_auc": 0.49441113925358326
+  },
+  "outer_cv_std": {
+    "accuracy": 0.02960191252587513,
+    "balanced_accuracy": 0.031374140254949515,
+    "precision": 0.0536552720999082,
+    "recall": 0.13490820150904337,
+    "f1": 0.10171827926348137,
+    "roc_auc": 0.016793034935983976
+  },
+  "invalid_requested_components": "6 and 8: unavailable because data contains only 4 channels",
+  "seconds": 13.700625400000263
+}
