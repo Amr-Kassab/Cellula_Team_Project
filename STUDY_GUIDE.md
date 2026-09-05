@@ -572,3 +572,49 @@ Multiplying raw counts (~$300,000$) by this factor yields real physiological val
 > 2. **Preventing Ringing**: Detrending first prevents digital filters from "ringing like a bell" and corrupting the first 1–2 seconds.
 > 3. **50 Hz Notch ($Q=30$)**: A razor-sharp sniper filter that eliminates AC electrical wall hum (49.2–50.8 Hz) without harming brain rhythms.
 > 4. **Zero-Phase**: Forward-backward filtering cancels out time delays, ensuring motor imagery event timing remains millisecond-accurate.
+
+---
+
+### 7.3 Complete Quick-Reference: All Filters & Algorithms by Name
+
+When presenting to your instructor, use these precise scientific names. This demonstrates mastery of biomedical digital signal processing (DSP) and machine learning.
+
+#### 1. Temporal & Frequency-Domain Filters
+| Filter Name | Exact Scientific Name | Python Function / Package | Purpose in Project |
+| :--- | :--- | :--- | :--- |
+| **IIR Notch Filter** | 2nd-Order Infinite Impulse Response Notch Filter | `scipy.signal.iirnotch` | Deletes the sharp $50\text{ Hz}$ AC powerline hum from electrical wiring ($Q=30.0$, bandwidth $\approx 1.67\text{ Hz}$). |
+| **Butterworth Bandpass Filter** | 4th-Order Zero-Phase Butterworth Bandpass Filter (Second-Order Sections) | `scipy.signal.butter(..., output='sos')` | Suppresses slow DC drifts ($<0.5\text{ Hz}$) and muscle EMG noise ($>40\text{ Hz}$). Maximally flat passband with no ripple. |
+| **Forward-Backward Filter (`filtfilt` / `sosfiltfilt`)** | Zero-Phase Digital Filtering (Gustafsson's Method) | `scipy.signal.sosfiltfilt` & `scipy.signal.filtfilt` | Passes signals forward then backward to cancel phase delay, ensuring zero time shift ($0\text{ ms}$ delay) for brain events. |
+| **Linear Detrending Filter** | Ordinary Least Squares (OLS) Linear Trend Removal | `scipy.signal.detrend(type='linear')` | Removes linear electrochemical half-cell potential drift before filtering to prevent edge ringing. |
+
+#### 2. Spatial Filters
+| Filter Name | Exact Scientific Name | Mathematical Formula | Purpose in Project |
+| :--- | :--- | :--- | :--- |
+| **CAR Filter** | Common Average Reference | $V_i^{\text{CAR}}(t) = V_i(t) - \frac{1}{M}\sum_{j=1}^M V_j(t)$ | Subtracts the instantaneous mean across all scalp electrodes to eliminate distant shared reference noise and unmask local cortical dynamics. |
+| **Surface Laplacian Filter** | Hjorth Local Laplacian / Orthogonal Contrast Filter | $V_{\text{C3}}^{\text{Lap}} = V_{\text{C3}} - \frac{1}{K}\sum V_{\text{surrounding}}$ | Calculates the second spatial derivative of surface potential, acting as a spatial high-pass filter that eliminates volume conduction. |
+
+#### 3. Preprocessing, Resampling & Statistical Algorithms
+| Algorithm Name | Exact Scientific Name | Implementation | Purpose in Project |
+| :--- | :--- | :--- | :--- |
+| **Spline / Linear Interpolation** | 1D Continuous Piecewise Interpolation | `scipy.interpolate.interp1d` | Converts unevenly-spaced, jittered Bluetooth timestamps into an exact uniform $250.0\text{ Hz}$ temporal grid ($2,500$ samples). |
+| **PTP Amplitude Thresholding** | Peak-to-Peak Extreme Value Detection | $\text{PTP} = \max(x) - \min(x)$ | Rejects trials where signal range exceeds $200\ \mu\text{V}$ (ocular blinks, head motion, electrode pops). |
+| **Robust Z-Score Outlier Detection** | Median Absolute Deviation (MAD) Hampel Identifier | $Z = 0.6745 \times \frac{\text{Var} - \text{Median}(\text{Var})}{\text{MAD}}$ | Identifies non-Gaussian energy bursts and noisy trials without being distorted by extreme outliers. |
+| **Winsorization** | Two-Tailed Statistical Winsorizing Soft-Clipper | Clips values to $[\mu - 4.5\sigma, \mu + 4.5\sigma]$ | Soft-clips isolated single-sample contact glitches in clean trials without truncating physiological waves. |
+| **Z-Score Normalization** | Standard Gaussian Standardization | $z = \frac{x - \mu}{\sigma + \epsilon}$ | Standardizes each channel to zero mean and unit variance for neural network training stability. |
+
+#### 4. Machine Learning & Deep Learning Algorithms
+| Model / Algorithm Name | Exact Scientific Name | Architecture Details | Theoretical Function |
+| :--- | :--- | :--- | :--- |
+| **CSP** | Common Spatial Patterns | Generalized Eigenvalue Decomposition ($C_1 w = \lambda C_2 w$) | Maximizes signal variance for Class 1 (Left) while minimizing it for Class 2 (Right) in the $8–30\text{ Hz}$ band. |
+| **SVM** | Support Vector Machine (Linear Kernel with Platt Scaling) | `sklearn.svm.SVC(kernel='linear', probability=True)` | Finds the optimal maximum-margin hyperplane separating CSP log-variance feature vectors. |
+| **EEGNet** | Compact Convolutional Neural Network for EEG (EEGNet-8,2) | 2D Temporal Conv + Depthwise Spatial Conv + Separable Conv | Custom-tailored for brain signals; learns frequency filterbanks and virtual spatial electrode combinations. |
+| **2D CNN** | Spatio-Temporal Convolutional Neural Network | Multi-stage temporal/spatial convolutions + dense head | General deep learning baseline learning temporal filters and spatial channel mixings. |
+| **CNN-LSTM** | Spatio-Temporal Recurrent Hybrid Network | 2D CNN feature extractor $\to$ LSTM recurrent layer ($32$ units) | Captures spatial electrode correlations and sequential temporal dependencies over the $3.0\text{ s}$ window. |
+| **Transformer** | Vision-Style Self-Attention Temporal Transformer | Patch Tokenization $\to$ Positional Encoding $\to$ 2-Layer 4-Head Encoder | Uses Multi-Head Self-Attention (MHSA) to model global long-range temporal dependencies across the epoch. |
+
+#### 5. Validation & Scientific Evaluation Protocols
+| Protocol Name | Scientific Definition | Implementation Details |
+| :--- | :--- | :--- |
+| **Stratified 5-Fold Cross-Validation** | Out-of-Fold (OOF) Stratified K-Fold | `StratifiedKFold(n_splits=5, shuffle=True, random_state=42)` ensuring 100% disjoint train/test splits with identical 50/50 class ratios in every fold. |
+| **Label Permutation Test** | Non-Parametric Monte Carlo Permutation Test | Shuffles ground-truth labels across 20 iterations to compute the empirical null distribution, mathematically proving models operate at chance level ($50.50\% \approx 50.15\%$). |
+| **Welch's Power Spectral Density (PSD)** | Welch's Averaged Modified Periodogram Method | `scipy.signal.welch` using overlapping Hanning windows to measure power distribution across frequency bands. |
