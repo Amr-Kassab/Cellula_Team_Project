@@ -14,6 +14,7 @@
 4. [Section 3: Models & Empirical Evaluation](#4-section-3-models--empirical-evaluation)
 5. [Section 4: Deployment](#5-section-4-deployment)
 6. [Section 5: Guide to Improving Results Across Every Section](#6-section-5-guide-to-improving-results-across-every-section)
+7. [Section 6: Plain-English Defense & Presentation Guide (Simple Terms for Instructors)](#7-plain-english-defense--presentation-guide-simple-terms-for-instructors)
 
 ---
 
@@ -472,3 +473,102 @@ To transition this BCI system from a chance-level baseline (~51%) to a high-accu
    - Reject predictions where softmax probability $<0.65$, holding the previous command rather than triggering false-positive robotic or assistive actuations.
 3. **Model Quantization (ONNX Runtime)**:
    - Export PyTorch EEGNet to ONNX format and run with ONNX Runtime for sub-millisecond latency on edge microcontrollers (e.g. Raspberry Pi / NVIDIA Jetson).
+
+---
+
+## 7. Plain-English Defense & Presentation Guide (Simple Terms for Instructors)
+
+This section provides intuitive, analogy-driven explanations of key engineering decisions in plain English. Use these explanations during your defense or presentation when your instructor asks *"Why did you do this?"* or *"What does this parameter actually mean?"*.
+
+---
+
+### 7.1 Step 1: Hardware ADC Scaling (0.02235 µV/count) & Uniform Resampling
+
+#### 1. The Core Problem: Why Raw Numbers Break the Pipeline
+* In raw CSV files, the signal readings look like `312450, 312520, ...` (integers around **$300,000$**).
+* Project rule #4 requires rejecting trials with extreme amplitudes ($> 200\ \mu\text{V}$).
+* If the code read $312,450$ and compared it directly to $200$, it would think every single signal is a massive artifact explosion, throwing **100% of the dataset into the trash**.
+* **Reason**: $300,000$ is not microvolts; it is an internal digital hardware measurement called an **ADC count**.
+
+#### 2. The Thermometer Analogy
+* An electronic thermometer sensor might internally measure **$3,700$** raw sensor ticks.
+* If it displayed $3,700$ on the screen, you would think you are boiling alive.
+* But the thermometer simply multiplies by $0.01$ to convert internal ticks into Celsius: **$37.0^\circ\text{C}$**.
+* That multiplier is the **Calibration / Scaling Factor**.
+
+#### 3. What is an ADC and why 24-bit?
+* **Brain Waves**: Tiny electrical oscillations on the scalp ($10–100\ \mu\text{V}$, where $1\ \mu\text{V} = 10^{-6}\text{ V}$).
+* **ADC (Analog-to-Digital Converter)**: The electronic chip on the EEG headset that converts continuous analog voltages into digital integers.
+* **24-bit Resolution**: Uses 24 binary bits ($2^{24}$ levels). Reserving 1 bit for the sign ($+$ or $-$) leaves **23 bits** for amplitude:
+  $$2^{23} - 1 = 8,388,607\text{ discrete steps}$$
+  The chip divides its measuring ruler into over **8 million tiny increments** to detect faint microvolt fluctuations.
+
+#### 4. Hardware Parameters (ADS1299 & OpenBCI)
+* The board is based on the Texas Instruments **ADS1299** biosensing chip (OpenBCI Cyton standard).
+* Amplifier **Gain = 24** (magnifies the faint brain wave 24 times before digitizing).
+* Reference Voltage **$V_{\text{ref}} = 4.5\text{ V}$**.
+
+#### 5. Deriving the 0.02235174 µV/count Factor
+The manufacturer's conversion formula from ADC counts to Volts is:
+$$\text{Volts} = \frac{V_{\text{ref}}}{\text{Gain} \times (2^{23} - 1)} = \frac{4.5}{24 \times 8,388,607} = 0.00000002235174\text{ V}$$
+Converting Volts to microvolts ($\times 10^6$):
+$$\text{Scale Factor} = \mathbf{0.02235174\ \mu\text{V per count}}$$
+Multiplying raw counts (~$300,000$) by this factor yields real physiological values (~$6,700\ \mu\text{V}$ total, with $20–50\ \mu\text{V}$ oscillatory brain dynamics after removing baseline).
+
+#### 6. What is Timestamp Jitter & Uniform Resampling?
+* Ideal sampling at $250\text{ Hz}$ means one sample arrives every **$0.004\text{ s}$** ($4\text{ ms}$).
+* In wireless Bluetooth/WiFi streaming, packets arrive with small delays (e.g., $\Delta t = 0.00398\text{ s}$, then $0.00403\text{ s}$, sometimes $0.015\text{ s}$). This is **timestamp jitter**.
+* **Why it breaks digital filters**: Butterworth filters, notch filters, and Fourier transforms (FFT) mathematically require a strictly uniform clock.
+* **Fix**: Spline/linear interpolation resamples each trial onto an exact uniform 250.0 Hz time grid ($2,500$ points for $10.0\text{ s}$).
+
+#### Instructor Quick Summary (Step 1)
+> 1. Converted raw hardware counts (~$300,000$) into real microvolts ($\mu\text{V}$) via $0.02235\ \mu\text{V/count}$, preventing the $200\ \mu\text{V}$ artifact threshold from discarding the dataset.
+> 2. The formula derives directly from the 24-bit ADS1299 amplifier specs ($4.5\text{V}$ reference, $24\times$ gain, $2^{23}-1$ steps).
+> 3. Spline resampling eliminated wireless Bluetooth jitter so all digital filters run on an exact $250.0\text{ Hz}$ clock.
+
+---
+
+### 7.2 Step 2: DC Offset Suppression, Linear Detrending & 50 Hz Powerline Notch Filter
+
+#### 1. The Chemistry: Electrochemical Half-Cell Potential (Accidental Battery)
+* When a metal electrode ($\text{Ag/AgCl}$) touches conductive electrolyte gel and salty human skin, a chemical reaction occurs.
+* This reaction forms a **miniature chemical battery** that generates a constant DC voltage of **~$6,700\ \mu\text{V}$ ($6.7\text{ mV}$)**.
+* In contrast, real brain waves are only **$20–50\ \mu\text{V}$**.
+
+> **The Flea on a Table Analogy:**  
+> Trying to measure a $20\ \mu\text{V}$ brain wave on top of a $6,700\ \mu\text{V}$ DC offset is like trying to measure a **flea jumping $1\text{ millimeter}$ while standing on top of a $6\text{-meter tall table}$**. If your camera is zoomed in to see millimeters, you can't even see the flea because it is up at the ceiling!
+
+#### 2. What is Linear Thermal Drift?
+* As the subject sits in the chair, microscopic sweat, skin temperature changes, and gel drying cause the chemical battery voltage to slowly drift upward or downward over time (e.g., from $6,700\ \mu\text{V}$ to $6,900\ \mu\text{V}$).
+
+#### 3. What is Linear Detrending and why do it *before* filtering?
+* **Linear Detrending**: Fits a straight line ($y = mx + b$) to the drift and subtracts it, bringing the signal down from the "$6\text{-meter ceiling}$" so it oscillates cleanly around **$0\ \mu\text{V}$**.
+* **Why do it before filtering? (Filter Edge Ringing)**:
+  * Digital filters have mathematical inertia (like a pendulum).
+  * If a filter starts at $t=0$ and is hit by a sudden jump from $0$ to $6,700\ \mu\text{V}$, it experiences an electronic shock.
+  * It starts **oscillating wildly ("ringing like a struck bell")** before settling down. This is called a **step-response transient**, and it completely corrupts the first **1 to 2 seconds** of the trial.
+  * Detrending first ensures the signal starts near zero, eliminating filter ringing.
+
+#### 4. What is 50 Hz Powerline Hum?
+* Wall wiring and electrical sockets oscillate at $50\text{ Hz}$ (AC power grid).
+* Wires emit electromagnetic fields, and the human body and electrode cables act like **antennas** picking up this $50\text{ Hz}$ hum.
+* It appears as a continuous, massive sine wave buzzing across every channel.
+
+#### 5. What is an IIR Notch Filter and Quality Factor $Q = 30.0$?
+* A **Notch Filter** is a specialized filter designed to carve out and delete **one single frequency** (50 Hz) while leaving everything else untouched.
+* **Quality Factor ($Q$)**: Controls how sharp or blunt the cut is:
+  $$\text{Bandwidth } (\Delta f) = \frac{f_0}{Q} = \frac{50\text{ Hz}}{30} \approx 1.67\text{ Hz}$$
+  * Low $Q$ ($Q=2$): A blunt cut deleting $35–65\text{ Hz}$, destroying critical brain waves.
+  * High $Q$ ($Q=30$): A razor-sharp sniper cut that deletes only **$49.2–50.8\text{ Hz}$** ($>40\text{ dB}$ drop), leaving sensorimotor rhythms below $45\text{ Hz}$ completely intact.
+
+#### 6. What does "Zero-Phase" Mean?
+* Normal electronic filters introduce a time delay (phase lag), shifting wave peaks by $50–100\text{ ms}$. In BCI, timing is everything.
+* **Zero-Phase Filtering (`filtfilt`)**: Filters the signal **forward**, then flips it and filters it **in reverse**. The forward delay and reverse delay cancel out:
+  $$\text{Total Delay} = (+\Delta t) + (-\Delta t) = \mathbf{0}$$
+  The noise is removed, but the brain wave peaks stay at the **exact millisecond** they actually happened in the brain.
+
+#### Instructor Quick Summary (Step 2)
+> 1. **DC Offset**: Metal + gel + skin creates an accidental chemical battery (~$6.7\text{ mV}$). Detrending removes this huge bias so brain signals wiggle around $0\ \mu\text{V}$.
+> 2. **Preventing Ringing**: Detrending first prevents digital filters from "ringing like a bell" and corrupting the first 1–2 seconds.
+> 3. **50 Hz Notch ($Q=30$)**: A razor-sharp sniper filter that eliminates AC electrical wall hum (49.2–50.8 Hz) without harming brain rhythms.
+> 4. **Zero-Phase**: Forward-backward filtering cancels out time delays, ensuring motor imagery event timing remains millisecond-accurate.
